@@ -91,7 +91,6 @@ sic_optimization() {
 }
 
 port_set() {
-        port
         [[ -z ${port} ]] && port="11688"
 }
 
@@ -117,9 +116,7 @@ bbr_install() {
 }
 
 user_set() {
-	user
 	[[ -z ${user} ]] && user="10010"
-	passwd
 	[[ -z ${passwd} ]] && passwd="10010"
 }
 
