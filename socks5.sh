@@ -276,7 +276,7 @@ menu() {
         install
         ;;
  *)
-	echo 1
+	echo "${RedBG}1${Font}"
         ;;
     esac
 
