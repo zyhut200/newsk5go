@@ -21,14 +21,3 @@ else
   echo "Socks5 运行正常"
 fi
 
-
-# 定时重启
-target_time="04:00"
-current_time=$(date +"%H:%M")
-if [[ $current_time == $target_time ]]; then
-  sleep 55s
-  pkill -9 gost
-else
-  echo "" >/dev/null
-fi
-
