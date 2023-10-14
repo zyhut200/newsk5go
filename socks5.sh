@@ -271,29 +271,10 @@ menu() {
 
 
 
-    read -rp "请输入数字：" menu_num
     case $menu_num in
     1)
         install
-        ;;
-    2)
-        systemctl stop sockd.service
-        judge "停止 ss5 "
-        ;;
-    3)
-        del_ss5
-        ;;
-    4)
-        update_ss5
-        ;;
-    5)
-        bbr_install
-        ;;
-    99)
-        exit 0
-        ;;
-    *)
-	echo -e "${RedBG}请输入正确的数字${Font}"
+
         ;;
     esac
 
