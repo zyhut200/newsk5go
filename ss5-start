@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+# 读取配置
+conf="/opt/ss5.conf"
+if [ -f "$conf" ]; then
+    user=$(sed -n '1p' $conf)
+    pass=$(sed -n '2p' $conf)
+    port=$(sed -n '3p' $conf)
+else
+    echo "配置文件不存在请重新安装"
+    exit
+fi
+
+
+# 进程守护
+gost=$(pgrep -x gost)
+if [ -z "$gost" ]; then
+  nohup /usr/local/bin/gost -L $user:$pass@:$port socks5://:$port >/dev/null 2>&1 &
+else
+  echo "Socks5 运行正常"
+fi
+
+
+# 定时重启
+target_time="04:00"
+current_time=$(date +"%H:%M")
+if [[ $current_time == $target_time ]]; then
+  sleep 55s
+  pkill -9 gost
+else
+  echo "" >/dev/null
+fi
+
