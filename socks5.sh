@@ -272,8 +272,11 @@ menu() {
 
 
     case $menu_num in
-    1        install
-
+  1)
+        install
+        ;;
+ *)
+	echo 1
         ;;
     esac
 
