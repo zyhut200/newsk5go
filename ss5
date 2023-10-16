@@ -11,10 +11,23 @@ if [[ ! -f /etc/os-release ]]; then
   echo "无法确定操作系统类型"
   exit 1
 fi
+
 source /etc/os-release
-if [[ "${ID}" != "centos" || ( "${VERSION_ID}" != "7" && "${VERSION_ID}" != "8" ) ]]; then
-  echo "本脚本仅支持CentOS7或8"
-  exit 1
+os_supported=false
+
+case "${ID}" in
+    "debian"|"ubuntu"|"centos")
+        os_supported=true
+        ;;
+    *)
+        echo "本脚本支持 Debian, Ubuntu, 和 CentOS"
+        exit 1
+        ;;
+esac
+
+if [ "$os_supported" = false ]; then
+    echo "本脚本不支持当前操作系统"
+    exit 1
 fi
 
 # 安装 Socks5
@@ -22,15 +35,15 @@ install_socks5() {
   if [ ! -f "/usr/local/bin/gost" ]; then
     # 下载配套程序和脚本
     echo "正在下载程序 ..."
-   curl -sSL -o /usr/local/bin/gost -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/gost
-   curl -sSL -o /usr/local/bin/ss5 -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/ss5
-   curl -sSL -o /usr/local/bin/ss5-start -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/ss5-start
-   chmod 755 /usr/local/bin/*
+    curl -sSL -o /usr/local/bin/gost -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/gost
+    curl -sSL -o /usr/local/bin/ss5 -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/ss5
+    curl -sSL -o /usr/local/bin/ss5-start -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/ss5-start
+    chmod 755 /usr/local/bin/*
     
     # 自动设置Socks5账号密码端口
     user="10010"  # 替换为你的用户名
     pass="10010"  # 替换为你的密码
-    port="11688"      # 替换为你的端口号
+    port="11688"  # 替换为你的端口号
 
     # 把用户输入保存到配置文件
     echo "$user" > /opt/ss5.conf
