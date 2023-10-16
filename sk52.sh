@@ -5,51 +5,47 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-install_dante_debian() {
-    apt update
-    apt install -y dante-server
+install_dependencies() {
+    if [ -f /etc/debian_version ]; then
+        apt update
+        apt install -y git gcc make
+    elif [ -f /etc/redhat-release ]; then
+        yum groupinstall -y "Development Tools"
+        yum install -y git
+    else
+        echo "Unsupported operating system"
+        exit 1
+    fi
 }
 
-install_dante_centos() {
-    yum install -y epel-release
-    yum install -y dante-server
+install_microsocks() {
+    git clone https://github.com/rofl0r/microsocks.git
+    cd microsocks
+    make
+    cp microsocks /usr/local/bin
 }
 
-if [ -f /etc/debian_version ]; then
-    install_dante_debian
-elif [ -f /etc/redhat-release ]; then
-    install_dante_centos
-else
-    echo "Unsupported operating system"
-    exit 1
-fi
+create_systemd_service() {
+    cat > /etc/systemd/system/microsocks.service <<EOL
+[Unit]
+Description=MicroSocks SOCKS5 Proxy
+After=network.target
 
-cat > /etc/danted.conf <<EOL
-logoutput: syslog
-internal: 0.0.0.0 port = 11688
-external: eth0
-socksmethod: username
-user.privileged: root
-user.notprivileged: nobody
-client pass {
-    from: 0.0.0.0/0 to: 0.0.0.0/0
-    log: error connect disconnect
-}
-socks pass {
-    from: 0.0.0.0/0 to: 0.0.0.0/0
-    log: error connect disconnect
-}
+[Service]
+ExecStart=/usr/local/bin/microsocks -1 -i 0.0.0.0 -p 11688 -u 10010 -P 10010
+User=nobody
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
 EOL
 
-useradd -m 10010
-echo "10010:10010" | chpasswd
+    systemctl enable microsocks
+    systemctl start microsocks
+}
 
-if [ -f /etc/debian_version ]; then
-    systemctl enable danted
-    systemctl start danted
-elif [ -f /etc/redhat-release ]; then
-    systemctl enable danted
-    systemctl start danted
-fi
+install_dependencies
+install_microsocks
+create_systemd_service
 
-echo "Dante SOCKS5 server is installed and running on port 11688 with username and password as 10010"
+echo "MicroSocks is installed and running on port 11688 with username and password as 10010"
