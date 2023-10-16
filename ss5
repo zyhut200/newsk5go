@@ -33,12 +33,12 @@ fi
 # 安装 Socks5
 install_socks5() {
   if [ ! -f "/usr/local/bin/gost" ]; then
-    # 下载配套程序和脚本
+    # 下载gost程序
     echo "正在下载程序 ..."
-    curl -sSL -o /usr/local/bin/gost -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/gost
-    curl -sSL -o /usr/local/bin/ss5 -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/ss5
-    curl -sSL -o /usr/local/bin/ss5-start -L https://raw.githubusercontent.com/zyhut200/newsk5go/main/ss5-start
-    chmod 755 /usr/local/bin/*
+    wget https://github.com/ginuerzh/gost/releases/download/v2.11.1/gost-linux-amd64-2.11.1.gz
+    gunzip gost-linux-amd64-2.11.1.gz
+    chmod +x gost-linux-amd64-2.11.1
+    mv gost-linux-amd64-2.11.1 /usr/local/bin/gost
     
     # 自动设置Socks5账号密码端口
     user="10010"  # 替换为你的用户名
@@ -50,12 +50,24 @@ install_socks5() {
     echo "$pass" >> /opt/ss5.conf
     echo "$port" >> /opt/ss5.conf
     
-    # 配置计划任务
-    echo >> /etc/crontab
-    echo "*/1 * * * * root /usr/local/bin/ss5-start" >> /etc/crontab
+    # 创建一个systemd服务文件来运行gost
+    cat <<EOL > /etc/systemd/system/gost.service
+[Unit]
+Description=gost proxy
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/gost -L socks5://$user:$pass@:$port -L udp://:$port
+Restart=on-failure
+User=nobody
+
+[Install]
+WantedBy=multi-user.target
+EOL
     
-    # 立即启动 Socks5
-    /usr/local/bin/ss5-start
+    # 启动和启用gost服务
+    systemctl start gost
+    systemctl enable gost
     
     # 输出配置信息
     echo "Socks5 安装成功连接信息如下"
