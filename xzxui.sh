@@ -1,5 +1,7 @@
 #!/usr/bin/expect
 
+sudo yum install expect
+
 # 设置超时时间，根据需要调整
 set timeout 30
 
