@@ -7,7 +7,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Variables
-PORT=20222
+PORT=10100
 USER="qwe"
 PASSWORD="123"
 
