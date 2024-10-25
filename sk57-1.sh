@@ -7,9 +7,9 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Variables
-PORT=5588
-USER="wl781109!!"
-PASSWORD="wl781109!!"
+PORT=15000
+USER="nieduli"
+PASSWORD="li110704"
 
 # Check if the OS is supported
 if ! [ -e /etc/os-release ]; then
